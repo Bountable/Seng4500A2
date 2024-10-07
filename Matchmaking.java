@@ -18,7 +18,7 @@ public class Matchmaking {
         // Broadcast declarations
         InetAddress broadcastAddress = InetAddress.getByName(args[0]);
         int broadcastPort = Integer.parseInt(args[1]);
-        int tcpPort = generateRandomPort();
+        int tcpPort = 5001; // Use a fixed TCP port
 
         DatagramSocket datagramSocket = new DatagramSocket();
         datagramSocket.setBroadcast(true);
@@ -40,23 +40,24 @@ public class Matchmaking {
                 String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength());
                 System.out.println("Received message: " + receivedMessage);
 
-                if (receivedMessage.equals("NEW GAME")) {
-                    System.out.println("Match found. Connecting to player...");
+                if (receivedMessage.startsWith("NEW GAME:")) {
+                    String[] parts = receivedMessage.split(":");
+                    int senderTcpPort = Integer.parseInt(parts[1]);
+                    System.out.println("Match found. Connecting to player on port " + senderTcpPort + "...");
 
-                    // Connect to the sender of the message via TCP (Player 2 connects to Player 1)
+                    // Connect to the sender of the message via TCP
                     InetAddress player1Address = receivePacket.getAddress();
-                    clientSocket = new Socket(player1Address, tcpPort);
-                    System.out.println("Connected to Player 1 via TCP: " + player1Address + " :" + tcpPort);
+                    clientSocket = new Socket(player1Address, senderTcpPort);
+                    System.out.println("Connected to Player 1 via TCP: " + player1Address + " :" + senderTcpPort);
 
                     gameFound = true;
                 }
-
             } catch (SocketTimeoutException e) {
                 // No 'NEW GAME' message received within 30 seconds
                 System.out.println("No 'NEW GAME' message received within 30 seconds. Sending out [NEW GAME]...");
 
                 // Send "NEW GAME" message if no game was found within the timeout period
-                String newGameMessage = "NEW GAME";
+                String newGameMessage = "NEW GAME:" + tcpPort;
                 byte[] sendData = newGameMessage.getBytes();
                 DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcastAddress, broadcastPort);
                 datagramSocket.send(sendPacket);
