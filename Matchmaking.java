@@ -18,9 +18,11 @@ public class Matchmaking {
         // Broadcast declarations
         InetAddress broadcastAddress = InetAddress.getByName(args[0]);
         int broadcastPort = Integer.parseInt(args[1]);
-        int tcpPort = 5001; // Use a fixed TCP port
 
-        DatagramSocket datagramSocket = new DatagramSocket();
+        Random rand = new Random();
+        int tcpPort = 9000 + rand.nextInt(101);
+
+        DatagramSocket datagramSocket = new DatagramSocket(broadcastPort);
         datagramSocket.setBroadcast(true);
 
         ServerSocket serverSocket = null;
@@ -59,6 +61,7 @@ public class Matchmaking {
                 // Send "NEW GAME" message if no game was found within the timeout period
                 String newGameMessage = "NEW GAME:" + tcpPort;
                 byte[] sendData = newGameMessage.getBytes();
+                
                 DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcastAddress, broadcastPort);
                 datagramSocket.send(sendPacket);
 
