@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.Random;
 
 public class Matchmaking {
 
@@ -17,7 +18,7 @@ public class Matchmaking {
         // Broadcast declarations
         InetAddress broadcastAddress = InetAddress.getByName(args[0]);
         int broadcastPort = Integer.parseInt(args[1]);
-        int tcpPort = broadcastPort + 1; // Use a different port for TCP connections
+        int tcpPort = generateRandomPort();
 
         DatagramSocket datagramSocket = new DatagramSocket();
         datagramSocket.setBroadcast(true);
@@ -100,5 +101,11 @@ public class Matchmaking {
         // Proceed with the game logic here
         System.out.println("Game setup complete. Ready to start the game.");
     }
+
+     private static int generateRandomPort() {
+        Random rand = new Random();
+        int MIN_PORT = 5000;
+        int MAX_PORT = 6000;
+        return rand.nextInt(MAX_PORT - MIN_PORT) + MIN_PORT;
+    }
 }
-    
