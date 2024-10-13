@@ -10,17 +10,37 @@ import java.util.Random;
 public class Matchmaker {
 
   
-    private static final int BROADCAST_PORT = 50000; // UDP port for broadcasting
+    private static  int BROADCAST_PORT = 50000; // UDP port for broadcasting
     private static final int[] TCP_PORT_RANGE = {9000, 9100}; // TCP port range
+    private static  String BROADCAST_ADDRESS = "";
+
+
+    public static void main(String[] args) {
+        if (args.length < 2) {
+            System.out.println("Usage: java Matchmaker <broadcastAddress> <broadcastPort>");
+            return;
+        }
+    
+        try {
+            BROADCAST_ADDRESS = args[0];
+            BROADCAST_PORT = Integer.parseInt(args[1]);
+            connect();
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid port number. Please enter a valid integer for the broadcast port.");
+        } catch (IOException e) {
+            System.err.println("IO Exception occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
 
     public static void connect() throws IOException{
-        String broadcastAddress = "192.168.1.255"; // Replace with actual network broadcast address
         int timeoutSeconds = 30;
 
         // Start listening for game invitations
-        if (!listenForNewGame(broadcastAddress, BROADCAST_PORT, timeoutSeconds)) {
+        if (!listenForNewGame(BROADCAST_ADDRESS, BROADCAST_PORT, timeoutSeconds)) {
             // If no invitations were received, broadcast a new game
-            broadcastNewGame(broadcastAddress, BROADCAST_PORT);
+            broadcastNewGame(BROADCAST_ADDRESS, BROADCAST_PORT);
         }
         
     }
