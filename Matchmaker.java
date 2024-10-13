@@ -93,10 +93,23 @@ public class Matchmaker {
         System.out.println("Player 2 connected!");
 
         // Start exchanging game data (omitted here for simplicity)
-        Connect4Game connect4game = new Connect4Game();
-        connect4game.play();
+        GameManager gameManager = new GameManager();
+        try {
 
-        player2Socket.close();
-        serverSocket.close();
+            gameManager.playGame(player2Socket);
+
+        } catch (Exception e) {
+
+            System.out.println("Error: PlayGame Failure");
+            e.printStackTrace();
+
+            
+        }  
+        finally{
+            
+            player2Socket.close();
+            serverSocket.close();
+        }
+        
     }
 }

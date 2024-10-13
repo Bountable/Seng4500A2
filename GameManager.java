@@ -20,19 +20,33 @@ public class GameManager {
         }
     }
 
-
-
-    public static void Play(Socket socket) throws Exception {
-            Matchmaker.connect();//might cuase problems
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-
+    public void playGame(Socket socket) throws Exception {    
+        GameManager game = new GameManager();   
+        game.drawCurrentBoard();
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
     }
 
 
     private void drawCurrentBoard() {
+        System.out.println(" 0 1 2 3 4 5 6");
+		System.out.println("---------------");
+		for (int row = 0; row < board.length; row++){
+			System.out.print("|");
+			for (int col = 0; col < board[0].length; col++){
+				System.out.print(board[row][col]);
+				System.out.print("|");
+			}
+			System.out.println();
+			System.out.println("---------------");
+		}
+		System.out.println(" 0 1 2 3 4 5 6");
+		System.out.println();
+        
+    }
 
+    private void switchPlayer(){
+        if(currentPlayer == 'X') currentPlayer = 'O';
     }
 
 
