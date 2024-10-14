@@ -18,13 +18,23 @@ public class GameManager {
                 board[i][j] = '.';
             }
         }
+
     }
 
     public void playGame(Socket socket) throws Exception {    
-        GameManager game = new GameManager();   
-        game.drawCurrentBoard();
+        GameManager game =  new GameManager();
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+        drawCurrentBoard();
+        out.print("Format: INSERT: 1");
+
+
+        while (true) {
+            
+            
+        }
+
     }
 
 
@@ -43,6 +53,11 @@ public class GameManager {
 		System.out.println(" 0 1 2 3 4 5 6");
 		System.out.println();
         
+    }
+
+    private void BoardState(){
+
+
     }
 
     private void switchPlayer(){

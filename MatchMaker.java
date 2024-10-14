@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Random;
 
-public class Matchmaker {
+public class MatchMaker {
 
   
     private static  int BROADCAST_PORT = 50000; // UDP port for broadcasting
@@ -35,7 +35,7 @@ public class Matchmaker {
     
 
     public static void connect() throws IOException{
-        int timeoutSeconds = 30;
+        int timeoutSeconds = 5;
 
         // Start listening for game invitations
         if (!listenForNewGame(BROADCAST_ADDRESS, BROADCAST_PORT, timeoutSeconds)) {
