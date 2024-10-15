@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -34,34 +35,59 @@ public class GameManager {
 
     }
 
-    public void playGame(Socket socket) throws Exception {    
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        out = new PrintWriter(socket.getOutputStream(), true);
-
+    public void playGame(Socket socket) {
+        try {
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
     
-        boolean gameDone  = false;
-        while(gameDone == false){
-            if(currentPlayer == 'X'){ //player 1 turn
-                playTurn('X');
-
-
-
+            boolean gameDone = false;
+            drawCurrentBoard(); // Show the initial board
+    
+            while (!gameDone) {
+                if (currentPlayer == 'X') {
+                    playTurn('X');   // Player 1's turn
+                    receiveTurn();   // Wait for Player 2's response
+                } else {
+                    System.out.println("Waiting for Player 2's move...");
+                    receiveTurn();   // Wait for Player 2's move
+                    playTurn('O');   // Now Player 1 plays again
+                }
+    
+                drawCurrentBoard(); // Update the board after each move
+                switchPlayer();     // Switch turns
+    
+                // TODO: Add game win logic and set gameDone = true if someone wins
             }
-
+        } catch (IOException e) {
+            System.err.println("Error during game communication: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                System.err.println("Failed to close socket: " + e.getMessage());
+            }
         }
-           
-
     }
-
-
+    
     private void playTurn(char c) {
         System.out.print("Your turn. Enter column (1-7): ");
-        int column;
-        column = Integer.parseInt(this.scanner.nextLine());
-        System.out.println("Player Somehing placed" + column);
-        this.out.print("Sent out " + column);
+        int column = Integer.parseInt(scanner.nextLine());
+        
+        // Send the move to the other player
+        out.println(column);
+        out.flush();  // Ensure the message is sent immediately
+        
+        System.out.println("Sent column " + (column + 1) + " to the other player.");
 
         
+    }
+
+    private void receiveTurn() throws IOException {
+        String receivedMessage = in.readLine(); // Read the message from the other player
+        int column = Integer.parseInt(receivedMessage);
+        System.out.println("Received move: Player placed token in column " + (column + 1));
+
     }
 
     private void drawCurrentBoard() {

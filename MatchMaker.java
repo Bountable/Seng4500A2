@@ -97,39 +97,31 @@ public class MatchMaker {
     }
 
     public static void connectToPlayer(InetAddress address, int tcpPort) throws IOException {
-        // Connect to Player 1 via TCP
         Socket socket = new Socket(address, tcpPort);
         System.out.println("Connected to Player 1 on TCP port " + tcpPort);
-
-        // Start exchanging game data (omitted here for simplicity)
-        socket.close();
+    
+        // Start the game manager for Player 2
+        GameManager gameManager = new GameManager(socket, 'O');
+        gameManager.playGame(socket);  // Keep playing until the game is done
     }
+    
 
     public static void waitForPlayerConnection(int tcpPort) throws IOException {
         ServerSocket serverSocket = new ServerSocket(tcpPort);
         System.out.println("Waiting for Player 2 to connect on TCP port " + tcpPort);
-
+    
         Socket player2Socket = serverSocket.accept();
         System.out.println("Player 2 connected!");
-
-        // Start exchanging game data (omitted here for simplicity)
-        GameManager gameManager = new GameManager(player2Socket,'X');
+    
+        GameManager gameManager = new GameManager(player2Socket, 'X');
         try {
-
-            gameManager.playGame(player2Socket);
-
+            gameManager.playGame(player2Socket);  // Keep playing until the game is done
         } catch (Exception e) {
-
-            System.out.println("Error: PlayGame Failure");
+            System.err.println("Error during game play: " + e.getMessage());
             e.printStackTrace();
-
-            
-        }  
-        finally{
-            
+        } finally {
             player2Socket.close();
             serverSocket.close();
         }
-        
     }
 }
