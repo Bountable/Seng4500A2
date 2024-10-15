@@ -113,7 +113,7 @@ public class MatchMaker {
         System.out.println("Player 2 connected!");
 
         // Start exchanging game data (omitted here for simplicity)
-        GameManager gameManager = new GameManager();
+        GameManager gameManager = new GameManager(player2Socket,'X');
         try {
 
             gameManager.playGame(player2Socket);

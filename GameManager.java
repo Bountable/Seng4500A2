@@ -2,41 +2,67 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class GameManager {
 
-    private final int rows = 6;
-    private final int columns = 7;
-    private final char[][] board = new char[rows][columns];
+    private final int ROWS = 6;
+    private final int COLUMNS = 7;
+    private final char[][] board = new char[ROWS][COLUMNS];
+
     private char currentPlayer = 'X'; // Player 1 is 'X', Player 2 is 'O'
 
+    private BufferedReader in;
+    private PrintWriter out;
 
-    public GameManager() {
+    private Scanner scanner;
+
+    private Socket socket;
+
+
+    public GameManager(Socket socket, char currentPlayer) {
+        this.socket = socket;
+        this.currentPlayer = currentPlayer;
+
         // Initialize the board with empty slots
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLUMNS; j++) {
                 board[i][j] = '.';
             }
         }
+        this.scanner = new Scanner(System.in);
 
     }
 
     public void playGame(Socket socket) throws Exception {    
-        GameManager game =  new GameManager();
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        out = new PrintWriter(socket.getOutputStream(), true);
 
-        drawCurrentBoard();
-        out.print("Format: INSERT: 1");
+    
+        boolean gameDone  = false;
+        while(gameDone == false){
+            if(currentPlayer == 'X'){ //player 1 turn
+                playTurn('X');
 
 
-        while (true) {
-            
-            
+
+            }
+
         }
+           
 
     }
 
+
+    private void playTurn(char c) {
+        System.out.print("Your turn. Enter column (1-7): ");
+        int column;
+        column = Integer.parseInt(this.scanner.nextLine());
+        System.out.println("Player Somehing placed" + column);
+        this.out.print("Sent out " + column);
+
+        
+    }
 
     private void drawCurrentBoard() {
         System.out.println(" 0 1 2 3 4 5 6");
