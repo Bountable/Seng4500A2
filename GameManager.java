@@ -11,19 +11,18 @@ public class GameManager {
     private final int COLUMNS = 7;
     private final char[][] board = new char[ROWS][COLUMNS];
 
-    private char currentPlayer = 'X'; // Player 1 is 'X', Player 2 is 'O'
+    private char currentPlayer; // 'X' for Player 1, 'O' for Player 2
 
     private BufferedReader in;
     private PrintWriter out;
 
     private Scanner scanner;
-
     private Socket socket;
 
-
-    public GameManager(Socket socket, char currentPlayer) {
+    public GameManager(Socket socket, char startingPlayer) {
         this.socket = socket;
-        this.currentPlayer = currentPlayer;
+        this.currentPlayer = startingPlayer;
+        this.scanner = new Scanner(System.in);
 
         // Initialize the board with empty slots
         for (int i = 0; i < ROWS; i++) {
@@ -31,36 +30,34 @@ public class GameManager {
                 board[i][j] = '.';
             }
         }
-        this.scanner = new Scanner(System.in);
-
     }
 
-    public void playGame(Socket socket) {
+    public void playGame() {
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
-    
+
             boolean gameDone = false;
-            drawCurrentBoard(); // Show the initial board
-    
+            drawCurrentBoard();
+
             while (!gameDone) {
-                if (currentPlayer == 'X') {
-                    playTurn('X');   // Player 1's turn
-                    receiveTurn();   // Wait for Player 2's response
-                } else {
+                if (currentPlayer == 'X') {  // Player 1's turn
+                    playTurn('X');
+                } else {  // Player 2's turn
                     System.out.println("Waiting for Player 2's move...");
-                    receiveTurn();   // Wait for Player 2's move
-                    playTurn('O');   // Now Player 1 plays again
+                    receiveTurn();
                 }
-    
-                drawCurrentBoard(); // Update the board after each move
-                switchPlayer();     // Switch turns
-    
-                // TODO: Add game win logic and set gameDone = true if someone wins
+
+                drawCurrentBoard();
+                if (checkWin()) {
+                    System.out.println("Player " + currentPlayer + " wins!");
+                    gameDone = true;
+                }
+
+                switchPlayer();  // Switch to the other player
             }
         } catch (IOException e) {
             System.err.println("Error during game communication: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             try {
                 socket.close();
@@ -69,71 +66,72 @@ public class GameManager {
             }
         }
     }
-    
-    private void playTurn(char c) {
-        System.out.print("Your turn. Enter column (1-7): ");
-        int column = Integer.parseInt(scanner.nextLine());
-        
-        // Send the move to the other player
-        out.println(column);
-        out.flush();  // Ensure the message is sent immediately
-        
-        System.out.println("Sent column " + (column + 1) + " to the other player.");
 
-        
+    private void playTurn(char player) {
+        int column;
+        boolean validMove = false;
+
+        // Keep prompting the player until a valid move is made
+        while (!validMove) {
+            System.out.print("Your turn. Enter column (1-7): ");
+            column = Integer.parseInt(scanner.nextLine()) - 1; // Convert to 0-based index
+
+            if (insertToken(player, column)) {
+                validMove = true;
+                out.println(column);  // Send the move to the other player
+                out.flush();
+                System.out.println("Sent column " + (column + 1) + " to the other player.");
+            } else {
+                System.out.println("Invalid move. Try again.");
+            }
+        }
     }
 
     private void receiveTurn() throws IOException {
-        String receivedMessage = in.readLine(); // Read the message from the other player
+        String receivedMessage = in.readLine();
         int column = Integer.parseInt(receivedMessage);
-        System.out.println("Received move: Player placed token in column " + (column + 1));
 
+        System.out.println("Received move: Player placed token in column " + (column + 1));
+        insertToken(currentPlayer, column);
+    }
+
+    private boolean insertToken(char player, int column) {
+        if (column < 0 || column >= COLUMNS) {
+            return false; // Invalid column number
+        }
+
+        // Find the first empty row in the selected column
+        for (int row = ROWS - 1; row >= 0; row--) {
+            if (board[row][column] == '.') {
+                board[row][column] = player;  // Place the player's token
+                return true;
+            }
+        }
+
+        return false; // Column is full
     }
 
     private void drawCurrentBoard() {
-        System.out.println(" 0 1 2 3 4 5 6");
-		System.out.println("---------------");
-		for (int row = 0; row < board.length; row++){
-			System.out.print("|");
-			for (int col = 0; col < board[0].length; col++){
-				System.out.print(board[row][col]);
-				System.out.print("|");
-			}
-			System.out.println();
-			System.out.println("---------------");
-		}
-		System.out.println(" 0 1 2 3 4 5 6");
-		System.out.println();
-        
+        System.out.println(" 1 2 3 4 5 6 7");
+        System.out.println("---------------");
+        for (int row = 0; row < ROWS; row++) {
+            System.out.print("|");
+            for (int col = 0; col < COLUMNS; col++) {
+                System.out.print(board[row][col]);
+                System.out.print("|");
+            }
+            System.out.println();
+            System.out.println("---------------");
+        }
+        System.out.println(" 1 2 3 4 5 6 7");
     }
 
-    private void BoardState(){
-
-
+    private void switchPlayer() {
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
 
-    private void switchPlayer(){
-        if(currentPlayer == 'X') currentPlayer = 'O';
+    private boolean checkWin() {
+        // TODO: Implement win condition (horizontal, vertical, diagonal check)
+        return false;
     }
-
-
-
-    // private boolean insertToken(int column) {
-
-    // }
-
-    // public boolean checkHorizontalWin(){
-
-    // }
-
-    // public boolean checkVerticalWin(){
-
-    // }
-
-    // public boolean checkDiagonalWin(){
-
-    // }
-
-   
-    
 }

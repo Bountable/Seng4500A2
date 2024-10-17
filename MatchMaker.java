@@ -102,10 +102,10 @@ public class MatchMaker {
     
         // Start the game manager for Player 2
         GameManager gameManager = new GameManager(socket, 'O');
-        gameManager.playGame(socket);  // Keep playing until the game is done
+        gameManager.playGame();  // Keep playing until the game is done
     }
     
-
+ 
     public static void waitForPlayerConnection(int tcpPort) throws IOException {
         ServerSocket serverSocket = new ServerSocket(tcpPort);
         System.out.println("Waiting for Player 2 to connect on TCP port " + tcpPort);
@@ -115,7 +115,7 @@ public class MatchMaker {
     
         GameManager gameManager = new GameManager(player2Socket, 'X');
         try {
-            gameManager.playGame(player2Socket);  // Keep playing until the game is done
+            gameManager.playGame();  // Keep playing until the game is done
         } catch (Exception e) {
             System.err.println("Error during game play: " + e.getMessage());
             e.printStackTrace();
