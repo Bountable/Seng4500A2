@@ -28,6 +28,7 @@ public class GameManager {
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLUMNS; j++) {
                 board[i][j] = '.';
+                
             }
         }
     }
@@ -74,16 +75,20 @@ public class GameManager {
         // Keep prompting the player until a valid move is made
         while (!validMove) {
             System.out.print("Your turn. Enter column (1-7): ");
-            column = Integer.parseInt(scanner.nextLine()) - 1; // Convert to 0-based index
-
-            if (insertToken(player, column)) {
-                validMove = true;
-                out.println(column);  // Send the move to the other player
-                out.flush();
-                System.out.println("Sent column " + (column + 1) + " to the other player.");
-            } else {
+            if(Integer.parseInt(scanner.nextLine())-1 < 0 || Integer.parseInt(scanner.nextLine())-1 > COLUMNS ){ //check valid move
+                System.out.println("Invalid move. Try again.");
+                column = Integer.parseInt(scanner.nextLine()) - 1; // Convert to 0-based index
+                if (insertToken(player, column)) {
+                    validMove = true;
+                    out.println(column);  // Send the move to the other player
+                    out.flush();
+                    System.out.println("Sent column " + (column + 1) + " to the other player.");
+                } 
+            }
+            else{
                 System.out.println("Invalid move. Try again.");
             }
+            
         }
     }
 
@@ -132,6 +137,59 @@ public class GameManager {
 
     private boolean checkWin() {
         // TODO: Implement win condition (horizontal, vertical, diagonal check)
+        /*
+         * Check top side and diagnal
+         * 
+         * 
+         */
+
+         //check line 4 to if there is 4 match
+         for(int i =0; i<ROWS;i++){
+
+         }
+
+        checkTopWin();
+        checkSideWin();
+        checkDiagonalWin();
+                
+         
         return false;
+
+    }
+
+    public int checkTopWin() {
+        int countX = 0;
+        int countO = 0;
+        for(int x= 0; x<=ROWS; x++){ //check 
+            for(int y=0;y<= COLUMNS; y++){
+                if(board[x][y] == 'X'){ //check 4 matches for X
+                    countX ++;
+                }
+                else countX = 0; //need 4 in a collumn to win
+
+                if(board[x][y] == 'O'){ //check 4 matches for O
+                    countO ++;
+
+                }
+                else countO=0;
+            }
+        }
+
+        if(countX == 4) return  1; //X wins
+        if(countO == 4) return 2; //O Wins
+        return 0; //no win found
+        
+    
+    }
+
+    private boolean checkSideWin(){
+        return false;
+     
+
+    }
+
+    private boolean checkDiagonalWin(){
+        return false;
+
     }
 }
