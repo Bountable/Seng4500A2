@@ -136,19 +136,12 @@ public class GameManager {
     }
 
     private boolean checkWin() {
-        // TODO: Implement win condition (horizontal, vertical, diagonal check)
        
-       // checkDiagonalWin();
+
+        checkTopWin();
+        checkSideWin();
+        checkDiagonalWin();
                 
-        if(checkTopWin() == 1 ||checkSideWin() == 1){
-            return true; //chack THIS!!
-
-        }
-        else if(checkTopWin() == 2 || checkSideWin() == 2){
-            return true;
-
-
-        }
          
         return false;
 
@@ -179,32 +172,14 @@ public class GameManager {
     
     }
 
-    private int checkSideWin(){
-        int countX = 0;
-        int countO = 0;
-        for(int y=0;y<= COLUMNS; y++){
-        for(int x= 0; x<=ROWS; x++){ //check 
-                if(board[y][x] == 'X'){ //check 4 matches for X
-                    countX ++;
-                }
-                else countX = 0; //need 4 in a collumn to win
-
-                if(board[y][x] == 'O'){ //check 4 matches for O
-                    countO ++;
-
-                }
-                else countO=0;
-            }
-        }
-
-        if(countX == 4) return  1; //X wins
-        if(countO == 4) return 2; //O Wins
-        return 0; //no win found     
+    private boolean checkSideWin(){
+        return false;
+     
 
     }
 
-    // private boolean checkDiagonalWin(){
-    //     return false;
+    private boolean checkDiagonalWin(){
+        return false;
 
-    // }
+    }
 }
