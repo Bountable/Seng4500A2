@@ -16,7 +16,7 @@ public class Connect4Game {
         try {
             BROADCAST_ADDRESS = args[0];
             BROADCAST_PORT = Integer.parseInt(args[1]);
-            MatchMaker.connect();
+            MatchMaker.connect(BROADCAST_ADDRESS, BROADCAST_PORT);
             
         } catch (NumberFormatException e) {
             System.err.println("Invalid port number. Please enter a valid integer for the broadcast port.");

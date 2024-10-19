@@ -16,31 +16,32 @@ public class MatchMaker {
 
 
     public static void main(String[] args) {
-        if (args.length < 2) {
-            System.out.println("Usage: java Matchmaker <broadcastAddress> <broadcastPort>");
-            return;
-        }
+        // if (args.length < 2) {
+        //     System.out.println("Usage: java Matchmaker <broadcastAddress> <broadcastPort>");
+        //     return;
+        // }
     
-        try {
-            BROADCAST_ADDRESS = args[0];
-            BROADCAST_PORT = Integer.parseInt(args[1]);
-            connect();
-        } catch (NumberFormatException e) {
-            System.err.println("Invalid port number. Please enter a valid integer for the broadcast port.");
-        } catch (IOException e) {
-            System.err.println("IO Exception occurred: " + e.getMessage());
-            e.printStackTrace();
-        }
+        // try {
+
+        //     BROADCAST_ADDRESS = args[0];
+        //     BROADCAST_PORT = Integer.parseInt(args[1]);
+        //     connect();
+        // } catch (NumberFormatException e) {
+        //     System.err.println("Invalid port number. Please enter a valid integer for the broadcast port.");
+        // } catch (IOException e) {
+        //     System.err.println("IO Exception occurred: " + e.getMessage());
+        //     e.printStackTrace();
+        //}
     }
     
 
-    public static void connect() throws IOException{
+    public static void connect(String address, int port) throws IOException{
         int timeoutSeconds = 5;
 
         // Start listening for game invitations
-        if (!listenForNewGame(BROADCAST_ADDRESS, BROADCAST_PORT, timeoutSeconds)) {
+        if (!listenForNewGame(address, port, timeoutSeconds)) {
             // If no invitations were received, broadcast a new game
-            broadcastNewGame(BROADCAST_ADDRESS, BROADCAST_PORT);
+            broadcastNewGame(address, port);
         }
         
     }
