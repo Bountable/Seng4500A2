@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 public class GameManager {
 
+    //TODO FIX ERRORS
     private final int ROWS = 6;
     private final int COLUMNS = 7;
     private final char[][] board = new char[ROWS][COLUMNS];
@@ -78,7 +79,7 @@ public class GameManager {
         boolean validMove = false;
 
         while (!validMove) {
-            System.out.print("Your turn. Enter column (1-7): ");
+            System.out.print("Your turn " + "(" + currentPlayer + ")" +  "Enter column (1-7): ");
             column = Integer.parseInt(scanner.nextLine()) - 1;  // Convert to 0-based index
 
             if (insertToken(player, column)) {
@@ -115,20 +116,26 @@ public class GameManager {
     }
 
     private void drawCurrentBoard() {
-        System.out.println(" 1 2 3 4 5 6 7");
-        System.out.println("---------------");
+        System.out.println("  1   2   3   4   5   6   7 ");
+        System.out.println("╔═══╦═══╦═══╦═══╦═══╦═══╦═══╗");
         for (int row = 0; row < ROWS; row++) {
-            System.out.print("|");
+            System.out.print("║");
             for (int col = 0; col < COLUMNS; col++) {
-                System.out.print(board[row][col]);
-                System.out.print("|");
+                char token = board[row][col];
+                String symbol = switch (token) {
+                    case 'X' -> "X";  // Player 1's token
+                    case 'O' -> "O";  // Player 2's token
+                    default -> " ";   // Empty slot
+                };
+                System.out.print(" " + symbol + " ║");
             }
             System.out.println();
-            System.out.println("---------------");
+            if (row < ROWS - 1) {
+                System.out.println("╠═══╬═══╬═══╬═══╬═══╬═══╬═══╣");
+            }
         }
-        System.out.println(" 1 2 3 4 5 6 7");
+        System.out.println("╚═══╩═══╩═══╩═══╩═══╩═══╩═══╝");
     }
-
     private void switchTurn() {
         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
