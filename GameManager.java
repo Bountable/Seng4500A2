@@ -6,8 +6,6 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class GameManager {
-
-    //TODO FIX ERRORS
     private final int ROWS = 6;
     private final int COLUMNS = 7;
     private final char[][] board = new char[ROWS][COLUMNS];
@@ -80,16 +78,22 @@ public class GameManager {
 
         while (!validMove) {
             System.out.print("Your turn " + "(" + currentPlayer + ")" +  "Enter column (1-7): ");
-            column = Integer.parseInt(scanner.nextLine()) - 1;  // Convert to 0-based index
+            String input = scanner.nextLine().trim();  // Read input once
 
-            if (insertToken(player, column)) {
-                validMove = true;
-                out.println(column);  // Send the move to the other player
-                out.flush();
-                System.out.println("Sent column " + (column + 1) + " to the other player.");
-            } else {
-                System.out.println("Invalid move. Try again.");
+            //TODO HERE
+            if(input.matches("[1-7]")){
+                column = Integer.parseInt(input) - 1;
+                if (insertToken(player, column)) {
+                    validMove = true;
+                    out.println(column);  // Send the move to the other player
+                    out.flush();
+                    System.out.println("Sent column " + (column + 1) + " to the other player.");
+                } 
             }
+            else {
+                System.out.println("Invalid move. Please input a number from 1-7");
+            }
+         
         }
     }
 
