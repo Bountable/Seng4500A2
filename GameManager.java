@@ -18,6 +18,12 @@ public class GameManager {
     private Scanner scanner;
     private Socket socket;
 
+    /**
+     * Initiates the Game board.
+     * 
+     * @param socket socket both usrs will connect too
+     * @param localPlayer sets the local.
+     */
     public GameManager(Socket socket, char localPlayer) {
         this.socket = socket;
         this.localPlayer = localPlayer;  // Set the role for this player
@@ -32,6 +38,12 @@ public class GameManager {
         }
     }
 
+
+    /**
+     * Main Looop for the Connect4 game
+     * 
+     * 
+     */
     public void playGame() {
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -45,7 +57,7 @@ public class GameManager {
                     // If it's this player's turn
                     playTurn(localPlayer);
                 } else {
-                    // If it's the other player's turn, wait for their move
+                    // other players turn, wait. for receied turn
                     System.out.println("Waiting for the other player's move...");
                     receiveTurn();
                 }
@@ -54,6 +66,7 @@ public class GameManager {
 
                 if (checkWin()) {
                     System.out.println("Player " + currentPlayer + " wins!");
+                    //YOU WIN
                     gameDone = true;
                     out.print("Player " + currentPlayer + " wins!");
                     break;
@@ -66,12 +79,19 @@ public class GameManager {
         } finally {
             try {
                 socket.close();
+                socket.close();
             } catch (IOException e) {
                 System.err.println("Failed to close socket: " + e.getMessage());
             }
         }
     }
 
+    /**
+     * Handles the insert of the board tokens, and communcates the token to the 
+     * other player
+     * 
+     * @param player which player is making the move.
+     */
     private void playTurn(char player) {
         int column;
         boolean validMove = false;
@@ -80,27 +100,30 @@ public class GameManager {
             System.out.print("Your turn " + "(" + currentPlayer + ")" +  "Enter column (1-7): ");
             String input = scanner.nextLine().trim();  // Read input once
 
-            //TODO HERE
-            if(input.matches("[1-7]")){
-                column = Integer.parseInt(input) - 1;
+            if (input.matches("[1-7]")) {
+                column = Integer.parseInt(input) - 1;  // Adjust for 0-based index
                 if (insertToken(player, column)) {
                     validMove = true;
-                    out.println(column);  // Send the move to the other player
+                    out.println("INSERT:" + (column + 1));  // Send 1-based column
                     out.flush();
                     System.out.println("Sent column " + (column + 1) + " to the other player.");
                 } 
-            }
-            else {
+            } else {
                 System.out.println("Invalid move. Please input a number from 1-7");
             }
          
         }
     }
 
+    /**
+     * Recieves the token positio of the opponent player.
+     * 
+     * @throws IOException
+     */
     private void receiveTurn() throws IOException {
         String receivedMessage = in.readLine();
-        int column = Integer.parseInt(receivedMessage);
-
+        int column = Integer.parseInt(receivedMessage.split(":")[1]) - 1;  // Convert to 0-based index
+        
         System.out.println("Received move: Player placed token in column " + (column + 1));
         insertToken(currentPlayer, column);
     }
@@ -115,10 +138,17 @@ public class GameManager {
                 board[row][column] = player;
                 return true;
             }
+           
+            
         }
+        System.out.println("Column is full");
         return false;  // Column is full
     }
 
+
+    /**
+     * Just draws the board.
+     */
     private void drawCurrentBoard() {
         System.out.println("  1   2   3   4   5   6   7 ");
         System.out.println("╔═══╦═══╦═══╦═══╦═══╦═══╦═══╗");
@@ -127,9 +157,9 @@ public class GameManager {
             for (int col = 0; col < COLUMNS; col++) {
                 char token = board[row][col];
                 String symbol = switch (token) {
-                    case 'X' -> "X";  // Player 1's token
-                    case 'O' -> "O";  // Player 2's token
-                    default -> " ";   // Empty slot
+                    case 'X' -> "X";
+                    case 'O' -> "O";
+                    default -> " ";  // Empty slot
                 };
                 System.out.print(" " + symbol + " ║");
             }
@@ -144,10 +174,13 @@ public class GameManager {
         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
 
+
     private boolean checkWin() {
         return checkTopWin() || checkSideWin() || checkDiagonalWin();
     }
 
+
+    // The check wins a bit slow can make it faster  rn its just iterating everything
     public boolean checkTopWin() {
         for (int row = 0; row < ROWS; row++) {
             int countX = 0, countO = 0;
@@ -204,7 +237,6 @@ public class GameManager {
                 }
             }
         }
-
 
         //Check ↖ Directions
         for (int row = 0; row < 3; row++) {

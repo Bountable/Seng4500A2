@@ -16,24 +16,16 @@ public class MatchMaker {
 
 
     public static void main(String[] args) {
-        // if (args.length < 2) {
-        //     System.out.println("Usage: java Matchmaker <broadcastAddress> <broadcastPort>");
-        //     return;
-        // }
-    
-        // try {
-
-        //     BROADCAST_ADDRESS = args[0];
-        //     BROADCAST_PORT = Integer.parseInt(args[1]);
-        //     connect();
-        // } catch (NumberFormatException e) {
-        //     System.err.println("Invalid port number. Please enter a valid integer for the broadcast port.");
-        // } catch (IOException e) {
-        //     System.err.println("IO Exception occurred: " + e.getMessage());
-        //     e.printStackTrace();
-        //}
+  
     }
     
+
+    /**
+     *
+     * @param address
+     * @param port
+     * @throws IOException
+     */
 
     public static void connect(String address, int port) throws IOException{
         int timeoutSeconds = 5;
@@ -46,6 +38,15 @@ public class MatchMaker {
         
     }
 
+    /**
+     * 
+     * 
+     * @param broadcastAddress
+     * @param port
+     * @param timeoutSeconds
+     * @return
+     * @throws IOException
+     */
     public static boolean listenForNewGame(String broadcastAddress, int port, int timeoutSeconds) throws IOException {
         DatagramSocket socket = new DatagramSocket(port);
         socket.setBroadcast(true);
@@ -76,6 +77,7 @@ public class MatchMaker {
         return false;
     }
 
+    
     public static void broadcastNewGame(String broadcastAddress, int port) throws IOException {
         DatagramSocket socket = new DatagramSocket();
         socket.setBroadcast(true);

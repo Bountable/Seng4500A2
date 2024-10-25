@@ -1,5 +1,7 @@
 import java.io.IOException;
 
+
+//Entry Point
 public class Connect4Game {
 
       
