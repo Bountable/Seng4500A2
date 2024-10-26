@@ -66,7 +66,12 @@ public class GameManager {
 
                 if (checkWin()) {
                     System.out.println("Player " + currentPlayer + " wins!");
-                    //YOU WIN
+
+                    //Opponent Player Wins send "YOU WIN" to player
+                    if(currentPlayer != localPlayer){
+                        out.print("YOU WIN");
+                        out.flush();
+                    }
                     gameDone = true;
                     out.print("Player " + currentPlayer + " wins!");
                     break;
@@ -86,6 +91,7 @@ public class GameManager {
         }
     }
 
+
     /**
      * Handles the insert of the board tokens, and communcates the token to the 
      * other player
@@ -97,7 +103,7 @@ public class GameManager {
         boolean validMove = false;
 
         while (!validMove) {
-            System.out.print("Your turn " + "(" + currentPlayer + ")" +  "Enter column (1-7): ");
+            System.out.print("Your turn " + "(" + currentPlayer + ") " +  "Enter column (1-7): ");
             String input = scanner.nextLine().trim();  // Read input once
 
             if (input.matches("[1-7]")) {
@@ -169,6 +175,8 @@ public class GameManager {
             }
         }
         System.out.println("╚═══╩═══╩═══╩═══╩═══╩═══╩═══╝");
+        System.out.println("  1   2   3   4   5   6   7 ");
+
     }
     private void switchTurn() {
         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';

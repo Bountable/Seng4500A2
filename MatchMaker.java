@@ -28,7 +28,7 @@ public class MatchMaker {
      */
 
     public static void connect(String address, int port) throws IOException{
-        int timeoutSeconds = 5;
+        int timeoutSeconds = 200; //TODO CHANGE TO 30sec
 
         // Start listening for game invitations
         if (!listenForNewGame(address, port, timeoutSeconds)) {
@@ -50,7 +50,7 @@ public class MatchMaker {
     public static boolean listenForNewGame(String broadcastAddress, int port, int timeoutSeconds) throws IOException {
         DatagramSocket socket = new DatagramSocket(port);
         socket.setBroadcast(true);
-        socket.setSoTimeout(timeoutSeconds * 1000); // Set the timeout to 30 seconds
+        socket.setSoTimeout(timeoutSeconds * 1000); // Set the timeout to seconds
         
         byte[] buffer = new byte[1024];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
@@ -77,7 +77,7 @@ public class MatchMaker {
         return false;
     }
 
-    
+
     public static void broadcastNewGame(String broadcastAddress, int port) throws IOException {
         DatagramSocket socket = new DatagramSocket();
         socket.setBroadcast(true);
@@ -91,7 +91,7 @@ public class MatchMaker {
         
         // Send broadcast
         socket.send(packet);
-        System.out.println("Broadcasted 'NEW GAME' message on port " + tcpPort);
+        System.out.println("Broadcasted 'NEW GAME' message on port " + port);
 
         socket.close();
 
