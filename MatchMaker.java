@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -21,14 +22,14 @@ public class MatchMaker {
     
 
     /**
-     *
+     *Main function that handles the broadcast and listening
      * @param address
      * @param port
      * @throws IOException
      */
 
     public static void connect(String address, int port) throws IOException{
-        int timeoutSeconds = 200; //TODO CHANGE TO 30sec
+        int timeoutSeconds = 5; 
 
         // Start listening for game invitations
         if (!listenForNewGame(address, port, timeoutSeconds)) {
@@ -39,19 +40,21 @@ public class MatchMaker {
     }
 
     /**
+     * Listens for opponents NEWGAME:PORT broadcast
      * 
-     * 
-     * @param broadcastAddress
-     * @param port
-     * @param timeoutSeconds
+     * @param broadcastAddress e.g 192.168.18.255
+     * @param port 
+     * @param timeoutSeconds 
      * @return
      * @throws IOException
      */
     public static boolean listenForNewGame(String broadcastAddress, int port, int timeoutSeconds) throws IOException {
-        DatagramSocket socket = new DatagramSocket(port);
+        DatagramSocket socket = new DatagramSocket(null);  // Create an unbound socket
+        socket.setReuseAddress(true);  // Allow reuse of the address/port
+        socket.bind(new InetSocketAddress(port));  // Now bind it to the desired port
         socket.setBroadcast(true);
-        socket.setSoTimeout(timeoutSeconds * 1000); // Set the timeout to seconds
-        
+        socket.setSoTimeout(timeoutSeconds * 1000);  // Set the timeout to seconds
+
         byte[] buffer = new byte[1024];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         System.out.println("Listening for 'NEW GAME' messages...");
@@ -59,11 +62,16 @@ public class MatchMaker {
         try {
             socket.receive(packet);
             String message = new String(packet.getData(), 0, packet.getLength());
+
+            if(message == null || message.isEmpty()){
+                System.out.println("Oppenent as forfeited the game.");
+            }
+
             if (message.startsWith("NEW GAME:")) {
                 String[] parts = message.split(":");
                 int tcpPort = Integer.parseInt(parts[1]);
                 System.out.println("Received 'NEW GAME' message from " + packet.getAddress() + " on port " + tcpPort);
-                
+
                 // Connect to Player 1 using TCP
                 connectToPlayer(packet.getAddress(), tcpPort);
                 return true;
@@ -78,6 +86,12 @@ public class MatchMaker {
     }
 
 
+    /**
+     * Broadcast a NEWGAME:PORT on the specified port
+     * @param broadcastAddress
+     * @param port
+     * @throws IOException
+     */
     public static void broadcastNewGame(String broadcastAddress, int port) throws IOException {
         DatagramSocket socket = new DatagramSocket();
         socket.setBroadcast(true);
@@ -109,6 +123,11 @@ public class MatchMaker {
     }
     
  
+    /**
+     * Waits for Player Connection
+     * @param tcpPort
+     * @throws IOException
+     */
     public static void waitForPlayerConnection(int tcpPort) throws IOException {
         ServerSocket serverSocket = new ServerSocket(tcpPort);
         System.out.println("Waiting for Player 2 to connect on TCP port " + tcpPort);

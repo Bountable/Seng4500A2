@@ -41,7 +41,7 @@ public class GameManager {
 
     /**
      * Main Looop for the Connect4 game
-     * 
+     * this will handle both players playing the turn and checks for any wins
      * 
      */
     public void playGame() {
@@ -52,6 +52,7 @@ public class GameManager {
             boolean gameDone = false;
             drawCurrentBoard();
 
+            //game loop
             while (!gameDone) {
                 if (currentPlayer == localPlayer) {
                     // If it's this player's turn
@@ -70,7 +71,10 @@ public class GameManager {
                     //Opponent Player Wins send "YOU WIN" to player
                     if(currentPlayer != localPlayer){
                         out.print("YOU WIN");
+                        
                         out.flush();
+                        //socket.close();
+
                     }
                     gameDone = true;
                     out.print("Player " + currentPlayer + " wins!");
@@ -122,18 +126,26 @@ public class GameManager {
     }
 
     /**
-     * Recieves the token positio of the opponent player.
+     * Recieves the token position of the opponent player
+     * message should be e.g INSERT: 3 for insert token in the 3rd column
      * 
      * @throws IOException
      */
     private void receiveTurn() throws IOException {
         String receivedMessage = in.readLine();
-        int column = Integer.parseInt(receivedMessage.split(":")[1]) - 1;  // Convert to 0-based index
+        int column = Integer.parseInt(receivedMessage.split(":")[1]) - 1;  // Convert to 0 based index
         
         System.out.println("Received move: Player placed token in column " + (column + 1));
         insertToken(currentPlayer, column);
     }
 
+
+    /**
+     * places the token within the board
+     * @param player  whether to use X or O.
+     * @param column which collumn the token should 'fall' into.
+     * @return true if column not full
+     */
     private boolean insertToken(char player, int column) {
         if (column < 0 || column >= COLUMNS) {
             return false;  // Invalid column number
@@ -153,7 +165,7 @@ public class GameManager {
 
 
     /**
-     * Just draws the board.
+     * Just draws the board with the token in place.
      */
     private void drawCurrentBoard() {
         System.out.println("  1   2   3   4   5   6   7 ");
@@ -163,8 +175,8 @@ public class GameManager {
             for (int col = 0; col < COLUMNS; col++) {
                 char token = board[row][col];
                 String symbol = switch (token) {
-                    case 'X' -> "X";
-                    case 'O' -> "O";
+                    case 'X' -> "X"; //chars to string
+                    case 'O' -> "O";//chars to string
                     default -> " ";  // Empty slot
                 };
                 System.out.print(" " + symbol + " ║");
@@ -178,11 +190,17 @@ public class GameManager {
         System.out.println("  1   2   3   4   5   6   7 ");
 
     }
+
+
     private void switchTurn() {
         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
 
 
+    /**
+     * check if any wins are found within the board
+     * @return true if win is found 
+     */
     private boolean checkWin() {
         return checkTopWin() || checkSideWin() || checkDiagonalWin();
     }
@@ -210,6 +228,11 @@ public class GameManager {
         return false;
     }
 
+    /**
+     * iterates through the board the X and O sideways in a row, resets to 0 if the next one is not the same if 4 is found
+     * return true for the player.
+     * @return True if win is found
+     */
     private boolean checkSideWin() {
         for (int col = 0; col < COLUMNS; col++) {
             int countX = 0, countO = 0;
@@ -231,12 +254,17 @@ public class GameManager {
         return false;
     }
 
-
+    
+    /**
+     * checks diagnoal wins both right and left diaganol, checks 4 cell both ways ahead.
+     * @return True if 4 in a row is found within 4 spaces diagonally
+     */
     private boolean checkDiagonalWin(){
         // Check ↗ Directions 
         for (int row = 3; row < 6; row++) {
             for (int col = 0; col < 4; col++){
                
+                //checl ahead
                 if(board[row][col] == 'X' && board[row-1][col+1] == 'X' && board[row-2][col+2] == 'X' && board[row-3][col+3] == 'X' ){
                     return true;
                 }
@@ -250,6 +278,7 @@ public class GameManager {
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 4; col++){
                
+                //check ahead
                 if(board[row][col] == 'X' && board[row+1][col+1] == 'X' && board[row+2][col+2] == 'X' && board[row+3][col+3] == 'X' ){
                     return true;
                 }
